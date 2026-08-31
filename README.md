@@ -20,14 +20,14 @@ A paleta em preto e roxo remete às cores das próprias estampas da coleção (t
 ## Funcionalidades
 
 - Cabeçalho fixo com navegação
-- Seção de apresentação da marca (hero)
-- Vitrine de produtos em cards (Flexbox), com botão de comprar
+- Seção de apresentação da marca
+- Vitrine de produtos em cards , com botão de comprar
 - Seção "Sobre" contando a história da marca
 - Formulário de contato com campos de texto, e-mail, telefone, select, textarea e checkbox
 - Página `conta.html` com formulários de login e cadastro, aberta ao clicar em "Comprar"
 - Rodapé com redes sociais
 
-> Os formulários (login, cadastro, contato) são apenas visuais/estáticos — não há back-end, então nenhum dado é realmente enviado ou salvo. Isso está fora do escopo da disciplina até aqui.
+> Os formulários (login, cadastro, contato) são apenas visuais/estáticos — não há back-end, então nenhum dado é realmente enviado ou salvo. Isso sera adicionado no segundo bimestre
 
 ## Tecnologias
 
