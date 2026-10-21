@@ -1,11 +1,18 @@
 "use strict";
 
+
 const CHAVE_SACOLA = "nullwear-sacola";
 const CHAVE_MENSAGENS = "nullwear-mensagens";
+const IDIOMA = "pt-BR";
+
+const CAMPOS_CONTATO = ["nome", "email", "assunto", "mensagem"];
+const CAMPOS_LOGIN = ["login-email", "login-senha"];
+const CAMPOS_CADASTRO = ["cad-nome", "cad-email", "cad-senha"];
 
 let filtroAtual = "todos";
 let textoBusca = "";
 let timerToast;
+
 
 function lerLocalStorage(chave, valorPadrao) {
   try {
@@ -28,6 +35,7 @@ function salvarLocalStorage(chave, valor) {
   }
 }
 
+
 function mostrarToast(mensagem) {
   const toast = document.getElementById("toast");
   if (!toast) return;
@@ -37,6 +45,7 @@ function mostrarToast(mensagem) {
   timerToast = setTimeout(() => toast.classList.remove("visivel"), 2600);
 }
 
+
 function obterSacola() {
   const sacola = lerLocalStorage(CHAVE_SACOLA, []);
   return Array.isArray(sacola) ? sacola : [];
@@ -44,38 +53,65 @@ function obterSacola() {
 
 function atualizarContadorSacola() {
   const contador = document.getElementById("contador-sacola");
-  const quantidade = obterSacola().reduce((total, item) => total + item.quantidade, 0);
-  if (contador) contador.textContent = quantidade;
+  if (!contador) return;
+  const quantidade = obterSacola().reduce((total, item) => total + (Number(item.quantidade) || 0), 0);
+  contador.textContent = quantidade;
 }
 
 function adicionarSacola(nomeProduto) {
+  if (!nomeProduto) return;
   const sacola = obterSacola();
   const produtoExistente = sacola.find(item => item.nome === nomeProduto);
 
   if (produtoExistente) {
-    produtoExistente.quantidade += 1;
+    produtoExistente.quantidade = (Number(produtoExistente.quantidade) || 0) + 1;
   } else {
     sacola.push({ nome: nomeProduto, quantidade: 1 });
   }
 
   if (salvarLocalStorage(CHAVE_SACOLA, sacola)) {
     atualizarContadorSacola();
-    const aviso = document.getElementById("aviso-sacola");
-    if (aviso) aviso.textContent = `${nomeProduto} foi adicionado à sua sacola.`;
     mostrarToast(`${nomeProduto} adicionado à sacola.`);
   }
 }
 
+function configurarBotoesSacola() {
+  document.querySelectorAll(".botao-adicionar").forEach(botao => {
+    botao.addEventListener("click", () => {
+      // O nome vem do próprio card; data-produto fica como reserva.
+      const nome = botao.closest(".produto")?.dataset.nome || botao.dataset.produto;
+      adicionarSacola(nome);
+    });
+  });
+}
+
+
+function normalizar(texto) {
+  return texto
+    .toLocaleLowerCase(IDIOMA)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function atualizarBotoesFiltro(valorAtivo) {
+  document.querySelectorAll(".filtro").forEach(botao => {
+    const ativo = botao.dataset.filtro === valorAtivo;
+    botao.classList.toggle("ativo", ativo);
+    botao.setAttribute("aria-pressed", String(ativo));
+  });
+}
+
 function aplicarFiltros() {
   const produtos = document.querySelectorAll(".produto");
+  if (produtos.length === 0) return;
+
+  const termo = normalizar(textoBusca);
   let encontrados = 0;
 
   produtos.forEach(produto => {
-    const categoria = produto.dataset.categoria;
-    const nome = (produto.dataset.nome || "").toLocaleLowerCase("pt-BR");
-    const combinaCategoria = filtroAtual === "todos" || categoria === filtroAtual;
-    const combinaBusca = nome.includes(textoBusca.toLocaleLowerCase("pt-BR"));
-    const mostrar = combinaCategoria && combinaBusca;
+    const nome = normalizar(produto.dataset.nome || "");
+    const combinaCategoria = filtroAtual === "todos" || produto.dataset.categoria === filtroAtual;
+    const mostrar = combinaCategoria && nome.includes(termo);
 
     produto.hidden = !mostrar;
     if (mostrar) encontrados++;
@@ -83,157 +119,188 @@ function aplicarFiltros() {
 
   const resultado = document.getElementById("resultado-busca");
   const vazio = document.getElementById("sem-resultados");
-  if (resultado) resultado.textContent = `${encontrados} ${encontrados === 1 ? "peça encontrada" : "peças encontradas"}`;
+  if (resultado) {
+    resultado.textContent = `${encontrados} ${encontrados === 1 ? "peça encontrada" : "peças encontradas"}`;
+  }
   if (vazio) vazio.hidden = encontrados !== 0;
 }
 
 function configurarFiltros() {
+  const busca = document.getElementById("busca-produtos");
   const botoes = document.querySelectorAll(".filtro");
+  if (!busca || botoes.length === 0) return;
+
   botoes.forEach(botao => {
     botao.addEventListener("click", () => {
       filtroAtual = botao.dataset.filtro || "todos";
-      botoes.forEach(outro => {
-        const ativo = outro === botao;
-        outro.classList.toggle("ativo", ativo);
-        outro.setAttribute("aria-pressed", String(ativo));
-      });
+      atualizarBotoesFiltro(filtroAtual);
       aplicarFiltros();
     });
   });
 
-  const busca = document.getElementById("busca-produtos");
   busca.addEventListener("input", event => {
     textoBusca = event.target.value.trim();
     aplicarFiltros();
   });
 
-  document.getElementById("limpar-filtros").addEventListener("click", () => {
-    filtroAtual = "todos";
-    textoBusca = "";
-    busca.value = "";
-    botoes.forEach(botao => {
-      const ativo = botao.dataset.filtro === "todos";
-      botao.classList.toggle("ativo", ativo);
-      botao.setAttribute("aria-pressed", String(ativo));
+  const limpar = document.getElementById("limpar-filtros");
+  if (limpar) {
+    limpar.addEventListener("click", () => {
+      filtroAtual = "todos";
+      textoBusca = "";
+      busca.value = "";
+      atualizarBotoesFiltro(filtroAtual);
+      aplicarFiltros();
+      busca.focus();
     });
-    aplicarFiltros();
-    busca.focus();
-  });
+  }
 }
+
 
 function configurarMenuMobile() {
   const botao = document.querySelector(".menu-toggle");
   const menu = document.getElementById("menu-principal");
   if (!botao || !menu) return;
 
+  function definirMenu(aberto) {
+    botao.setAttribute("aria-expanded", String(aberto));
+    botao.setAttribute("aria-label", aberto ? "Fechar menu" : "Abrir menu");
+    menu.classList.toggle("aberto", aberto);
+  }
+
   botao.addEventListener("click", () => {
-    const aberto = botao.getAttribute("aria-expanded") === "true";
-    botao.setAttribute("aria-expanded", String(!aberto));
-    botao.setAttribute("aria-label", aberto ? "Abrir menu" : "Fechar menu");
-    menu.classList.toggle("aberto", !aberto);
+    definirMenu(botao.getAttribute("aria-expanded") !== "true");
   });
 
   menu.querySelectorAll("a").forEach(link => {
-    link.addEventListener("click", () => {
-      menu.classList.remove("aberto");
-      botao.setAttribute("aria-expanded", "false");
-      botao.setAttribute("aria-label", "Abrir menu");
-    });
+    link.addEventListener("click", () => definirMenu(false));
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && menu.classList.contains("aberto")) {
+      definirMenu(false);
+      botao.focus();
+    }
   });
 }
 
-function definirErro(campo, mensagem) {
-  const entrada = document.getElementById(campo);
-  const erro = document.getElementById(`erro-${campo}`);
+
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+const regraNome = valor =>
+  valor.trim().length >= 3 || "Digite seu nome completo (mínimo de 3 caracteres).";
+const regraEmail = valor =>
+  REGEX_EMAIL.test(valor.trim()) || "Informe um e-mail válido.";
+
+const REGRAS = {
+  "nome": regraNome,
+  "email": regraEmail,
+  "assunto": valor => valor !== "" || "Selecione um assunto.",
+  "mensagem": valor => valor.trim().length >= 10 || "Escreva uma mensagem com pelo menos 10 caracteres.",
+  "login-email": regraEmail,
+  "login-senha": valor => valor !== "" || "Digite sua senha.",
+  "cad-nome": regraNome,
+  "cad-email": regraEmail,
+  "cad-senha": valor => valor.length >= 8 || "A senha precisa ter pelo menos 8 caracteres."
+};
+
+function definirErro(id, mensagem) {
+  const entrada = document.getElementById(id);
+  const erro = document.getElementById(`erro-${id}`);
   if (!entrada || !erro) return;
+
   entrada.classList.toggle("invalido", Boolean(mensagem));
   entrada.setAttribute("aria-invalid", String(Boolean(mensagem)));
+  entrada.setAttribute("aria-describedby", erro.id);
   erro.textContent = mensagem;
 }
 
-function validarContato(dados) {
-  let valido = true;
-  const nomeValido = dados.nome.trim().length >= 3;
-  const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email.trim());
-  const assuntoValido = dados.assunto !== "";
-  const mensagemValida = dados.mensagem.trim().length >= 10;
+function validarCampo(id) {
+  const entrada = document.getElementById(id);
+  const regra = REGRAS[id];
+  if (!entrada || !regra) return true;
 
-  definirErro("nome", nomeValido ? "" : "Digite seu nome completo (mínimo de 3 caracteres).");
-  definirErro("email", emailValido ? "" : "Informe um e-mail válido.");
-  definirErro("assunto", assuntoValido ? "" : "Selecione um assunto.");
-  definirErro("mensagem", mensagemValida ? "" : "Escreva uma mensagem com pelo menos 10 caracteres.");
-
-  if (!nomeValido || !emailValido || !assuntoValido || !mensagemValida) {
-    valido = false;
-  }
-  return valido;
+  const resultado = regra(entrada.value);
+  definirErro(id, resultado === true ? "" : resultado);
+  return resultado === true;
 }
 
-function configurarFormulario() {
-  const formulario = document.getElementById("form-contato");
-  if (!formulario) return;
+function limparErros(campos) {
+  campos.forEach(id => definirErro(id, ""));
+}
 
-  ["nome", "email", "assunto", "mensagem"].forEach(id => {
+function configurarFormulario(idFormulario, campos, aoValidar) {
+  const formulario = document.getElementById(idFormulario);
+  if (!formulario) return;
+  const status = formulario.querySelector(".status-formulario");
+
+  campos.forEach(id => {
     const campo = document.getElementById(id);
+    if (!campo) return;
+    campo.addEventListener("blur", () => validarCampo(id));
     campo.addEventListener("input", () => {
-      if (campo.classList.contains("invalido")) {
-        const dados = Object.fromEntries(new FormData(formulario).entries());
-        validarContato({
-          nome: dados.nome || "",
-          email: dados.email || "",
-          assunto: dados.assunto || "",
-          mensagem: dados.mensagem || ""
-        });
-      }
+      if (campo.classList.contains("invalido")) validarCampo(id);
     });
   });
 
   formulario.addEventListener("submit", event => {
     event.preventDefault();
 
-    const formData = new FormData(formulario);
-    const dados = {
-      nome: String(formData.get("nome") || "").trim(),
-      email: String(formData.get("email") || "").trim(),
-      telefone: String(formData.get("telefone") || "").trim(),
-      assunto: String(formData.get("assunto") || ""),
-      mensagem: String(formData.get("mensagem") || "").trim(),
-      newsletter: formData.get("newsletter") === "on",
-      criadoEm: new Date().toISOString()
-    };
+ 
+    const todosValidos = campos.map(validarCampo).every(Boolean);
 
-    if (!validarContato(dados)) {
-      const primeiroInvalido = formulario.querySelector(".invalido");
-      if (primeiroInvalido) primeiroInvalido.focus();
-      document.getElementById("status-contato").textContent = "Revise os campos destacados antes de enviar.";
+    if (!todosValidos) {
+      formulario.querySelector(".invalido")?.focus();
+      if (status) status.textContent = "Revise os campos destacados antes de enviar.";
       return;
     }
-
-    const mensagens = lerLocalStorage(CHAVE_MENSAGENS, []);
-    mensagens.push(dados);
-    const salvou = salvarLocalStorage(CHAVE_MENSAGENS, mensagens);
-    const status = document.getElementById("status-contato");
-
-    if (salvou) {
-      status.textContent = "Mensagem registrada neste navegador. O formulário não envia e-mails.";
-      mostrarToast("Dados salvos neste navegador.");
-      formulario.reset();
-      ["nome", "email", "assunto", "mensagem"].forEach(id => definirErro(id, ""));
-    }
+    aoValidar(formulario, status);
   });
 }
 
-function configurarBotoesSacola() {
-  document.querySelectorAll(".botao-adicionar").forEach(botao => {
-    botao.addEventListener("click", () => adicionarSacola(botao.dataset.produto));
-  });
+
+function enviarContato(formulario, status) {
+  const formData = new FormData(formulario);
+  const dados = {
+    nome: String(formData.get("nome") || "").trim(),
+    email: String(formData.get("email") || "").trim(),
+    telefone: String(formData.get("telefone") || "").trim(),
+    assunto: String(formData.get("assunto") || ""),
+    mensagem: String(formData.get("mensagem") || "").trim(),
+    newsletter: formData.get("newsletter") === "on",
+    criadoEm: new Date().toISOString()
+  };
+
+  const mensagens = lerLocalStorage(CHAVE_MENSAGENS, []);
+  mensagens.push(dados);
+
+  if (salvarLocalStorage(CHAVE_MENSAGENS, mensagens)) {
+    if (status) status.textContent = "Mensagem registrada neste navegador. O formulário não envia e-mails.";
+    mostrarToast("Dados salvos neste navegador.");
+    formulario.reset();
+    limparErros(CAMPOS_CONTATO);
+  }
 }
 
+
+function simularConta(campos) {
+  return (formulario, status) => {
+    if (status) status.textContent = "Formulário demonstrativo: nenhum dado foi enviado ou salvo.";
+    mostrarToast("Formulário validado (demonstração).");
+    formulario.reset();
+    limparErros(campos);
+  };
+}
+
+/* ===== Inicialização ===== */
 function iniciarPagina() {
   configurarMenuMobile();
   configurarFiltros();
-  configurarFormulario();
   configurarBotoesSacola();
+  configurarFormulario("form-contato", CAMPOS_CONTATO, enviarContato);
+  configurarFormulario("form-login", CAMPOS_LOGIN, simularConta(CAMPOS_LOGIN));
+  configurarFormulario("form-cadastro", CAMPOS_CADASTRO, simularConta(CAMPOS_CADASTRO));
   atualizarContadorSacola();
   aplicarFiltros();
 }
