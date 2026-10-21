@@ -3,92 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NULLWEAR</title>
+  <meta name="description" content="Entre ou crie sua conta NULLWEAR.">
+  <title>Entrar | NULLWEAR</title>
   <link rel="stylesheet" href="css/style.css">
+  <script src="js/script.js" defer></script>
 </head>
 <body>
+  <a class="pular-conteudo" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="cabecalho">
     <div class="container cabecalho-linha">
-      <a href="index.html" class="logo">NULLWEAR</a>
-
-      <nav>
-        <ul class="menu">
-          <li><a href="index.html">Voltar à loja</a></li>
-        </ul>
+      <a class="logo" href="index.html" aria-label="NULLWEAR — página inicial">NULL<span>WEAR</span><i>.</i></a>
+      <nav class="nav-principal nav-simples" aria-label="Navegação principal">
+        <a href="index.html">← Voltar à loja</a>
       </nav>
     </div>
   </header>
 
-  <main>
-
+  <main id="conteudo">
     <section class="secao">
       <div class="container">
-        <h2>Entre ou crie sua conta para continuar</h2>
-        <p>Para finalizar a compra, entre na sua conta ou cadastre-se.</p>
+        <div class="cabecalho-conta">
+          <p class="eyebrow">MINHA CONTA</p>
+          <h1 class="titulo-conta">Entre ou crie sua <span>conta.</span></h1>
+          <p class="texto-suave">Para finalizar a compra, entre na sua conta ou cadastre-se.</p>
+        </div>
 
         <div class="contas">
-
-          <form class="formulario" action="#" method="post">
+          <form id="form-login" class="formulario" novalidate>
             <fieldset>
               <legend>Entrar</legend>
 
               <div class="campo">
-                <label for="login-email">E-mail</label>
-                <input type="email" id="login-email" name="login-email" placeholder="voce@email.com" required>
+                <label for="login-email">E-mail <span>*</span></label>
+                <input type="email" id="login-email" name="login-email" placeholder="voce@email.com" autocomplete="email" required>
+                <small class="erro-campo" id="erro-login-email"></small>
               </div>
 
               <div class="campo">
-                <label for="login-senha">Senha</label>
-                <input type="password" id="login-senha" name="login-senha" placeholder="Sua senha" required>
+                <label for="login-senha">Senha <span>*</span></label>
+                <input type="password" id="login-senha" name="login-senha" placeholder="Sua senha" autocomplete="current-password" required>
+                <small class="erro-campo" id="erro-login-senha"></small>
               </div>
             </fieldset>
 
-            <button type="submit" class="botao">Entrar</button>
+            <button type="submit" class="botao botao-principal botao-largo">Entrar <span aria-hidden="true">↗</span></button>
+            <p class="nota-formulario">Formulário demonstrativo: nenhum dado é enviado ou salvo.</p>
+            <div class="status-formulario" role="status" aria-live="polite"></div>
           </form>
 
-          <form class="formulario" action="#" method="post">
+          <form id="form-cadastro" class="formulario" novalidate>
             <fieldset>
               <legend>Criar conta</legend>
 
               <div class="campo">
-                <label for="cad-nome">Nome completo</label>
-                <input type="text" id="cad-nome" name="cad-nome" placeholder="Digite seu nome" required>
+                <label for="cad-nome">Nome completo <span>*</span></label>
+                <input type="text" id="cad-nome" name="cad-nome" placeholder="Digite seu nome" autocomplete="name" required minlength="3">
+                <small class="erro-campo" id="erro-cad-nome"></small>
               </div>
 
               <div class="campo">
-                <label for="cad-email">E-mail</label>
-                <input type="email" id="cad-email" name="cad-email" placeholder="voce@email.com" required>
+                <label for="cad-email">E-mail <span>*</span></label>
+                <input type="email" id="cad-email" name="cad-email" placeholder="voce@email.com" autocomplete="email" required>
+                <small class="erro-campo" id="erro-cad-email"></small>
               </div>
 
               <div class="campo">
-                <label for="cad-senha">Senha</label>
-                <input type="password" id="cad-senha" name="cad-senha" placeholder="Crie uma senha" required>
+                <label for="cad-senha">Senha <span>*</span></label>
+                <input type="password" id="cad-senha" name="cad-senha" placeholder="Mínimo de 8 caracteres" autocomplete="new-password" required minlength="8">
+                <small class="erro-campo" id="erro-cad-senha"></small>
               </div>
             </fieldset>
 
-            <button type="submit" class="botao">Criar conta</button>
+            <button type="submit" class="botao botao-principal botao-largo">Criar conta <span aria-hidden="true">↗</span></button>
+            <p class="nota-formulario">Formulário demonstrativo: nenhum dado é enviado ou salvo.</p>
+            <div class="status-formulario" role="status" aria-live="polite"></div>
           </form>
-
         </div>
       </div>
     </section>
-
   </main>
 
   <footer class="rodape">
-    <div class="container">
-      <p class="logo">NULLWEAR</p>
-      <nav>
-        <ul class="menu">
-          <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
-          <li><a href="#" target="_blank" rel="noopener">Pinterest</a></li>
-          <li><a href="#" target="_blank" rel="noopener">WhatsApp</a></li>
-        </ul>
-      </nav>
-      <p>&copy; 2026 NULLWEAR. Todos os direitos reservados.</p>
+    <div class="container rodape-topo">
+      <a class="logo" href="index.html">NULL<span>WEAR</span><i>.</i></a>
+      <p>Coleção ES/TADS.</p>
+      <a href="#conteudo" class="voltar-topo">Voltar ao topo ↑</a>
+    </div>
+    <div class="container rodape-base">
+      <span>© 2026 NULLWEAR. Projeto acadêmico.</span>
+      <span>HTML · CSS · JavaScript</span>
     </div>
   </footer>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
