@@ -119,3 +119,69 @@ h2{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.06em;line-height:1.15;margi
 @media(max-width:760px){.container{width:min(var(--max),calc(100% - 32px))}.cabecalho{height:68px}.menu-toggle{display:flex;flex-direction:column;gap:5px;margin-left:auto}.menu-toggle span{width:22px;height:2px;background:var(--text);display:block}.nav-principal{display:none;position:absolute;top:67px;left:0;right:0;padding:18px 24px 22px;background:#101012;border-bottom:1px solid var(--border);flex-direction:column;align-items:stretch;gap:0}.nav-principal.aberto{display:flex}.nav-principal a{padding:12px 0;border-bottom:1px solid var(--border)}.nav-principal a:last-child{border-bottom:0}.sacola-link{font-size:.8rem}.hero{min-height:540px}.hero-conteudo{padding-block:80px}.hero-etiqueta{bottom:20px;font-size:.56rem}.secao{padding:70px 0}.cabecalho-secao{align-items:stretch;flex-direction:column}.busca-produtos{width:100%}.lista-produtos{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.produto-info{padding:13px}.produto h3{font-size:.9rem}.descricao-produto{font-size:.73rem;min-height:64px}.preco{font-size:.86rem}.sobre-grid,.contato-grid{grid-template-columns:1fr;gap:35px}.simbolo-null{width:82px;height:76px;font-size:2.3rem;margin-bottom:22px}.formulario{padding:20px}.rodape-topo{flex-wrap:wrap}.rodape-topo p{order:3;width:100%}}
 @media(max-width:420px){.lista-produtos{grid-template-columns:1fr}.produto-imagem{aspect-ratio:1.25}.descricao-produto{min-height:0}.linha-campos{flex-direction:column;gap:0}.hero-acoes{align-items:flex-start;flex-direction:column;gap:15px}.hero-nota{margin-top:30px}.rodape-base{flex-direction:column;gap:5px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.nav-simples a {
+  font-size: .87rem;
+  color: #c9c4d0;
+  transition: color .2s;
+}
+
+.nav-simples a:hover,
+.nav-simples a:focus-visible {
+  color: var(--accent);
+}
+
+
+.cabecalho-conta {
+  margin-bottom: 40px;
+}
+
+.titulo-conta {
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: -.06em;
+  margin-bottom: 14px;
+}
+
+
+.contas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+
+.formulario fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.formulario legend {
+  padding: 0;
+  margin-bottom: 22px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, .35);
+}
+
+
+.erro-campo:empty {
+  display: none;
+}
+
+
+@media (max-width: 760px) {
+  .contas {
+    grid-template-columns: 1fr;
+  }
+}
