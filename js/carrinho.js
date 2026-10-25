@@ -1,10 +1,8 @@
-// carrinho.js — carrinho lateral do NULLWEAR
-// Guarda os itens no localStorage, então eles continuam ao trocar de página.
+
 
 (function () {
   const CHAVE = "nullwear_carrinho";
 
-  // ---------- estado ----------
   function lerCarrinho() {
     try {
       return JSON.parse(localStorage.getItem(CHAVE)) || [];
@@ -19,12 +17,10 @@
 
   let itens = lerCarrinho();
 
-  // ---------- utilidades ----------
   function formatarPreco(valor) {
     return "R$ " + valor.toFixed(2).replace(".", ",");
   }
 
-  // "R$ 89,90" -> 89.9
   function lerPreco(texto) {
     const limpo = String(texto)
       .replace(/[^\d,.-]/g, "")
@@ -39,7 +35,6 @@
     return div.innerHTML;
   }
 
-  // ---------- cria a gaveta no HTML ----------
   function criarGaveta() {
     const overlay = document.createElement("div");
     overlay.className = "carrinho-overlay";
@@ -68,7 +63,6 @@
     document.body.appendChild(gaveta);
   }
 
-  // ---------- abrir / fechar ----------
   function abrir() {
     document.getElementById("carrinho-gaveta").classList.add("aberta");
     document.getElementById("carrinho-overlay").classList.add("aberta");
@@ -81,7 +75,6 @@
     document.body.classList.remove("carrinho-aberto");
   }
 
-  // ---------- desenha os itens ----------
   function render() {
     const lista = document.getElementById("carrinho-lista");
     const totalEl = document.getElementById("carrinho-total");
@@ -116,14 +109,12 @@
       btnFinalizar.disabled = false;
     }
 
-    // atualiza o número do ícone do carrinho
     const quantidade = itens.reduce((soma, i) => soma + i.qtd, 0);
     document.querySelectorAll("#contador-carrinho").forEach((el) => {
       el.textContent = quantidade;
     });
   }
 
-  // ---------- ações ----------
   function adicionar(produto) {
     const existente = itens.find((i) => i.id === produto.id);
     if (existente) {
@@ -151,7 +142,6 @@
     render();
   }
 
-  // Lê os dados do produto: primeiro pelos data-*, senão tenta pegar do card
   function lerProduto(botao) {
     const card = botao.closest("article, .card, .produto") || document;
     const nome =
@@ -173,12 +163,10 @@
     };
   }
 
-  // ---------- inicialização ----------
   document.addEventListener("DOMContentLoaded", function () {
     criarGaveta();
     render();
 
-    // botões "Comprar"
     document.querySelectorAll("[data-add-carrinho]").forEach((botao) => {
       botao.addEventListener("click", function (e) {
         e.preventDefault(); // impede de ir direto para conta.html
@@ -202,7 +190,6 @@
       if (e.key === "Escape") fechar();
     });
 
-    // +, − e remover (delegação de eventos)
     document.getElementById("carrinho-lista").addEventListener("click", function (e) {
       const botao = e.target.closest("[data-acao]");
       if (!botao) return;
