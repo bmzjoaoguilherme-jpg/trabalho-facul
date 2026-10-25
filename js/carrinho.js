@@ -217,16 +217,13 @@
       if (acao === "remover") remover(id);
     });
  
-    // finalizar compra -> página conta
     document.getElementById("carrinho-finalizar").addEventListener("click", function () {
       if (itens.length === 0) return;
       window.location.href = "conta.html";
     });
   });
 })();
- 
-Claude terminou a resposta
-Claude
+
 
 
 
